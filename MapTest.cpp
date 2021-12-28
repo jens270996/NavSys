@@ -2,6 +2,7 @@
 #include "List.hpp"
 #include "City.hpp"
 #include "Path.hpp"
+#include "PathFinding.hpp"
 #include <iostream>
 
 int main(void){
@@ -19,5 +20,7 @@ int main(void){
     std::cout<<Map::Path<Odense_Aarhus>::from::id<<std::endl; 
     std::cout<<Map::Path<Odense_Aarhus>::to::id<<std::endl;
     std::cout<<Map::Path<Odense_Aarhus>::cost<<std::endl;
-    std::cout<<Map::Path<Odense_Aarhus,Aarhus_Odense>::weight<<std::endl; 
+    std::cout<<Map::Path<Odense_Aarhus,Aarhus_Odense>::weight<<std::endl;
+
+    typedef typename Map::FindPath<City::Odense,City::Aarhus,MapGraph>::type path;
 }

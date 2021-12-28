@@ -23,10 +23,7 @@ template <typename T>
     template <typename... Ts>
     struct List
     {
-        // static const size_t size = sizeof...(Ts);
-        // typedef typename List_impl<Ts...>::last last;
-        // typedef typename List_impl<Ts...>::first first;
-        // typedef typename List<Ts...>::rest rest;
+
     };
     template <typename T,typename... Ts>
     struct List<T,Ts...>
@@ -62,44 +59,65 @@ template <typename T>
     struct List_Concatenate<T,List<Us...>>{
         typedef List<T,Us...> type;
     };
+    //Type and empty list
+    template<typename T>
+    struct List_Concatenate<T,List<>>{
+        typedef List<T> type;
+    };
     //List and type
     template<typename... Ts,typename U>
     struct List_Concatenate<List<Ts...>,U>{
         typedef List<Ts...,U> type;
     };
 
-
-    // template <typename... Ts, typename... Us>
-    // static constexpr auto operator+ (List<Ts...>,List<Us...>){return List<Ts...,Us...>{};}
-    // template <typename... Ts,typename T>
-    // static constexpr auto operator+ (List<Ts...>,T){return List<Ts...>{}+List<T>{};}
-
     //base templates
-    template<typename... Ts, typename T>
-    static constexpr bool contains(List<Ts...>,T);
+    template<typename T, typename U>
+    struct List_Contains{};
 
-
-    //specializations
-    template<typename... Ts, typename T, typename U>
-    static constexpr bool contains(List<T,Ts...>,U){
-        //if T and U are the same, the list contains U, otherwise recursively call contains without front element in list.
-        return std::conditional<std::is_same<T,U>::value,std::false_type,std::integral_constant<bool,contains(List<Ts...>{},U{})>>::type::value;
-    }
+    template<typename T, typename U, typename... Ts>
+    struct List_Contains<T,List<U,Ts...>>
+    {
+        typedef  typename List_Contains<T,List<Ts...>>::type type;
+        static const bool value =  List_Contains<T,List<Ts...>>::value;
+    };
+    template<typename T, typename... Ts>
+    struct List_Contains<T,List<T,Ts...>>
+    {
+        typedef std::true_type type;
+        static const bool value =  true;
+    };
     template<typename T>
-    static constexpr bool contains(List<>,T){
-        //reached end of list.
-        return false;
-    }
-    template <typename T,typename... Ts>
-    static constexpr auto unique(List<T,Ts...>){
-        return std::conditional<contains(List<Ts...>{},T{})
-            ,decltype(unique(List<Ts...>{}))
-            ,decltype(T{}+unique(List<Ts...>{}))>{};
-    }
-    template <typename T>
-    static constexpr auto unique(List<T>){
-        return List<T>{};
-    }
+    struct List_Contains<T,List<>>
+    {
+        typedef std::false_type type;
+        static const bool value =  false;
+    };
+
+    // template<typename... Ts, typename T>
+    // static constexpr bool contains(List<Ts...>,T);
+
+
+    // //specializations
+    // template<typename... Ts, typename T, typename U>
+    // static constexpr bool contains(List<T,Ts...>,U){
+    //     //if T and U are the same, the list contains U, otherwise recursively call contains without front element in list.
+    //     return std::conditional<std::is_same<T,U>::value,std::false_type,std::integral_constant<bool,contains(List<Ts...>{},U{})>>::type::value;
+    // }
+    // template<typename T>
+    // static constexpr bool contains(List<>,T){
+    //     //reached end of list.
+    //     return false;
+    // }
+    // template <typename T,typename... Ts>
+    // static constexpr auto unique(List<T,Ts...>){
+    //     return std::conditional<contains(List<Ts...>{},T{})
+    //         ,decltype(unique(List<Ts...>{}))
+    //         ,decltype(T{}+unique(List<Ts...>{}))>{};
+    // }
+    // template <typename T>
+    // static constexpr auto unique(List<T>){
+    //     return List<T>{};
+    // }
 
 
 
