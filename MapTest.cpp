@@ -1,18 +1,23 @@
 #include "Map.hpp"
 #include "List.hpp"
+#include "City.hpp"
+#include "Path.hpp"
+#include <iostream>
 
 int main(void){
 
-    // Template aliases
-    using Odense = Map::City<0>;
-    using Aarhus = Map::City<1>;
     // Map::City_Traits<0>::name="Odense";
     // Map::City_Traits<1>::name="Aarhus";
 
     //roads in both directions. To allow updates in a single direction
     //also allows for singular interpretation of a path.
-    using Odense_Aarhus = Map::Road<Odense,Aarhus,100,0>;
-    using Aarhus_Odense = Map::Road<Aarhus,Odense,100,0>;
+    using Odense_Aarhus = Map::Road<City::Odense,City::Aarhus,100,50>;
+    using Aarhus_Odense = Map::Road<City::Aarhus,City::Odense,100,50>;
 
-    using Map = Map::Map<TypeList::List<Odense,Aarhus>,TypeList::List<Odense_Aarhus,Aarhus_Odense>>;
+    using MapGraph = Map::Map<TypeList::List<City::Odense,City::Aarhus>,TypeList::List<Odense_Aarhus,Aarhus_Odense>>;
+
+    std::cout<<Map::Path<Odense_Aarhus>::from::id<<std::endl; 
+    std::cout<<Map::Path<Odense_Aarhus>::to::id<<std::endl;
+    std::cout<<Map::Path<Odense_Aarhus>::cost<<std::endl;
+    std::cout<<Map::Path<Odense_Aarhus,Aarhus_Odense>::weight<<std::endl; 
 }
