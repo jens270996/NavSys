@@ -9,30 +9,42 @@ namespace Map{
 
     //To and from are the same = target reached
     template<typename FROM,typename GRAPH, typename... ROADS, typename... PATHS>
-    struct FindPath_Impl<FROM,FROM,GRAPH,TypeList::List<ROADS...>,TypeList::List<PATHS...>>{
+    struct FindPath_Impl<FROM,FROM,GRAPH,TL::List<ROADS...>,TL::List<PATHS...>>{
         typedef Path<PATHS...> type;
     };
 
     //All edges have been tried unsuccessfully
     template<typename FROM,typename TO,typename GRAPH, typename... PATHS>
-    struct FindPath_Impl<FROM,TO,GRAPH,TypeList::List<>,TypeList::List<PATHS...>>{
-        typedef Path<TypeList::Invalid_Type> type;
+    struct FindPath_Impl<FROM,TO,GRAPH,TL::List<>,TL::List<PATHS...>>{
+        typedef Path<TL::Invalid_Type> type;
     };
-    //To and from are different
+    //To and from are different & Next city is not in path
     template<typename FROM,typename TO,typename GRAPH,typename ROAD, typename... ROADS, typename... PATHS>
-    struct FindPath_Impl<FROM,TO,GRAPH,TypeList::List<ROAD,ROADS...>,TypeList::List<PATHS...>,typename std::enable_if_t<!std::is_same<FROM,TO>::value>>{
+    struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
+    std::enable_if_t<!std::is_same<FROM,TO>::value && !TL::List_Contains<typename ROAD::to, typename Path<PATHS...>::cities>::type::value>
+    >{
+        //aliases
+        typedef typename ROAD::to NextCity;
+        typedef typename GetRoadsFromCity<NextCity,GRAPH>::type RoadsFromNextCity;
+        typedef typename FindPath_Impl<FROM,TO,GRAPH,TL::List<ROADS...>,TL::List<PATHS...>>::type PathWithoutNextRoad;
+        typedef typename FindPath_Impl<NextCity,TO,GRAPH,RoadsFromNextCity, TL::List<ROAD,PATHS...>>::type PathWithNextRoad; //må kun evalueres hvis path ikke indeholder dest for road.
         //Road goes back to previously visited City.
-        typedef typename std::conditional<TypeList::List_Contains<typename ROAD::to, typename TypeList::List_Concatenate<FROM,TypeList::List<PATHS...>>::type>::type::value,
-        typename FindPath_Impl<FROM,TO,GRAPH,TypeList::List<ROADS...>,TypeList::List<PATHS...>>::type,
-        typename Path_Comparer<typename FindPath_Impl<typename ROAD::to,TO,GRAPH,typename GetRoadsFromCity<typename ROAD::to,GRAPH>::type,TypeList::List<PATHS...,ROAD>>::type, //add road to path, and advance to next city
-                                typename FindPath_Impl<FROM,TO,GRAPH,TypeList::List<ROADS...>,TypeList::List<PATHS...>>::type> // skip current road and try next.
-                                ::shortest>
-        ::type type;
+        typedef typename Path_Comparer<PathWithNextRoad, //add road to path, and advance to next city
+                                PathWithoutNextRoad> // skip current road and try next.
+                                ::shortest type;
+    };
+    //To and from are different & Next city is in path
+    template<typename FROM,typename TO,typename GRAPH,typename ROAD, typename... ROADS, typename... PATHS>
+    struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
+    std::enable_if_t<!std::is_same<FROM,TO>::value && TL::List_Contains<typename ROAD::to, typename Path<PATHS...>::cities>::type::value>
+    >{
+        //If next city is already in path, skip to avoid infinite loops.
+        typedef typename FindPath_Impl<FROM,TO,GRAPH,TL::List<ROADS...>,TL::List<PATHS...>>::type type;
     };
 
     template<typename FROM, typename TO,typename GRAPH>
     struct FindPath{
-        // std::enable_if_t<(TypeList::List_Contains<FROM,typename GRAPH::cities>::type::value && TypeList::List_Contains<TO,typename GRAPH::cities>::type::value)>
-        typedef typename FindPath_Impl<FROM,TO,GRAPH,typename GetRoadsFromCity<FROM,GRAPH>::type,TypeList::List<>>::type type;
+        // std::enable_if_t<(TL::List_Contains<FROM,typename GRAPH::cities>::type::value && TL::List_Contains<TO,typename GRAPH::cities>::type::value)>
+        typedef typename FindPath_Impl<FROM,TO,GRAPH,typename GetRoadsFromCity<FROM,GRAPH>::type,TL::List<>>::type type;
     };
 }
