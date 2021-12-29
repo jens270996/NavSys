@@ -21,6 +21,10 @@ int main(void){
     std::cout<<Map::Path<Nyborg_Odense,Odense_Nyborg>::weight<<std::endl;
 
     typedef typename Map::FindPath<Aarhus,Copenhagen,MapGraph>::type path;
-    std::cout<<path::weight<<std::endl;
+    Map::PathFunctions<path>::PrintFull();
+    auto array = Map::PathFunctions<path>::getRoadIdArray();
+    for(size_t id : array){
+        std::cout<<"Id from array: "<<id<<std::endl;
+    }
     return 1;
 }

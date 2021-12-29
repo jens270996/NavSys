@@ -1,6 +1,7 @@
 #pragma once
 #include "List.hpp"
 #include "Map.hpp"
+#include<array>
 namespace Map{
     template<typename T, typename U = void>
     struct Path_Impl{};
@@ -46,9 +47,52 @@ namespace Map{
         static const int weight=INT32_MAX;
     };
 
-
-
-
     template<typename... Ts>
     using Path = Path_Impl<TL::List<Ts...>>; //Path is a list of roads in the order they should be transversed.
+
+    template<typename T>
+    struct PathFunctions{};
+
+    //Non empty path - partial specialization
+    template<typename T,typename... Ts>
+    struct PathFunctions<Path_Impl<TL::List<T,Ts...>>>{
+        //Functor must take a road id (size_t), cost (int) and weight(int) as argument.
+        // https://en.cppreference.com/w/cpp/types/result_of notes
+        template<typename Functor>
+        static constexpr void ForEachRoad(Functor functor){
+
+            functor(T::id,T::cost,T::weight);
+            PathFunctions<Path_Impl<TL::List<Ts...>>>::ForEachRoad(functor);
+        }
+        static std::array<size_t,TL::List<T,Ts...>::size> getRoadIdArray(){
+            std::array<size_t,TL::List<T,Ts...>::size> array;
+            int index=0;
+            ForEachRoad([&array,&index](size_t id, int cost, int weight){
+                array[index++]=id;
+            });
+            return array;
+        }
+
+        static void PrintFull(){
+            std::cout<<"Path goes from: "<<Path<T,Ts...>::from::id<<std::endl;
+            std::cout<<"Path goes to: "<<Path<T,Ts...>::to::id<<std::endl;
+            std::cout<<"With a total length of: "<<Path<T,Ts...>::weight<<std::endl;
+            std::cout<<"And a total cost of: "<<Path<T,Ts...>::cost<<std::endl;
+            std::cout<<"Consists of roads:"<<std::endl;
+            ForEachRoad([](size_t id, int cost, int weight){
+                std::cout<<"Road with ID:"<<id<<" cost: "<<cost<<" weight: "<<weight<<std::endl;
+            });
+        }
+    };
+    //Empty path full-specialization
+    template<>
+    struct PathFunctions<Path_Impl<TL::List<>>>{
+        static void PrintFull(){
+            std::cout<<"Empty Path..."<<std::endl;
+        }
+        template<typename Functor>
+        static void ForEachRoad(Functor functor){
+            return;
+        }
+    };
 }
