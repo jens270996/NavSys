@@ -23,11 +23,11 @@ namespace Map{
     struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
     std::enable_if_t<!std::is_same<FROM,TO>::value && !TL::List_Contains<typename ROAD::to, typename Path<PATHS...>::cities>::type::value>
     >{
-        //aliases
+        //helper defs - should go?
         typedef typename ROAD::to NextCity;
         typedef typename GetRoadsFromCity<NextCity,GRAPH>::type RoadsFromNextCity;
         typedef typename FindPath_Impl<FROM,TO,GRAPH,TL::List<ROADS...>,TL::List<PATHS...>>::type PathWithoutNextRoad;
-        typedef typename FindPath_Impl<NextCity,TO,GRAPH,RoadsFromNextCity, TL::List<ROAD,PATHS...>>::type PathWithNextRoad; //må kun evalueres hvis path ikke indeholder dest for road.
+        typedef typename FindPath_Impl<NextCity,TO,GRAPH,RoadsFromNextCity, TL::List<PATHS...,ROAD>>::type PathWithNextRoad; //må kun evalueres hvis path ikke indeholder dest for road. ellers inf loop
         //Road goes back to previously visited City.
         typedef typename Path_Comparer<PathWithNextRoad, //add road to path, and advance to next city
                                 PathWithoutNextRoad> // skip current road and try next.
