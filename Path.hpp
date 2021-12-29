@@ -7,6 +7,7 @@ namespace Map{
     struct Path_Impl{};
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<(T::size>1)>>{
+        static const size_t size = T::size;
         typedef typename T::first::from from;
         typedef typename T::last::to to;
         //Start of each road + 
@@ -23,6 +24,7 @@ namespace Map{
     //Path with single road
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<T::size==1>>{
+        static const size_t size = T::size;
         typedef typename T::first::from from;
         typedef typename T::last::to to;
         typedef TL::List<from,to> cities;
@@ -34,6 +36,7 @@ namespace Map{
     //Empty Path
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<T::size==0>>{
+        static const size_t size = T::size;
         typedef TL::List<> cities;
         static const int cost = 0;
         static const int weight=0;

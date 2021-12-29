@@ -26,5 +26,19 @@ int main(void){
     for(size_t id : array){
         std::cout<<"Id from array: "<<id<<std::endl;
     }
+    
+
+
+    //extract weights from each road:
+
+    //Kunne også være en vector i stedet:
+    std::array<int,path::size> weights;
+    int i=0;
+    Map::PathFunctions<path>::ForEachRoad([&weights,&i](size_t id, int cost, int weight){
+        weights[i++]=weight;
+    });
+    for(int weight : weights){
+        std::cout<<"Weight from array: "<<weight<<std::endl;
+    }
     return 1;
 }
