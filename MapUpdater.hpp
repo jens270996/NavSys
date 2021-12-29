@@ -1,18 +1,20 @@
 #include <boost/signals2.hpp>
-#include "MapUpdate.hpp"
+#include "Update.hpp"
 class MapUpdater{
     public:
+    MapUpdater();
     template <typename T>
-    void connect( T func_to_connect){
-        _signal.connect(T);
+    void connect(T funcToConnect){
+        _signal.connect(funcToConnect);
     }
 
 
     private:
-    boost::signals2::signal<void(MapUpdate)> _signal;
+    boost::signals2::signal<void(MapUpdater)> _signal;
 
-    MapUpdate generateUpdate(){
-        return MapUpdate();
+    Update generateUpdate(){
+        //return updates.Update attributes
+        return Update();
     }
 
 };

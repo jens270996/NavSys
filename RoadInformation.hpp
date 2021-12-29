@@ -1,10 +1,13 @@
 #include <string>
 
 class RoadInformation{
+    public:
+        RoadInformation(double traversalTimeImpact, bool isPassable,
+        std::string message);
+        RoadInformation();
     private:
-
-    double _traversal_time_impact;
-    bool _is_passable;
-    std::string _message;
+        double _traversalTimeImpact;
+        bool _is_passable;
+        std::string _message;
 
 };
