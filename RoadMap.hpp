@@ -51,7 +51,6 @@ namespace RoadMap{
     using Kalundborg_Slagelse = Road<Kalundborg,Slagelse,60,0,10>;
     using Slagelse_Kalundborg = Road<Slagelse,Kalundborg,60,0,11>;
     using Slagelse_Nyborg = Road<Slagelse,Nyborg,60,400,12>;
-
     //Fyn
     using Nyborg_Slagelse = Road<Nyborg,Slagelse,60,400,13>;
     using Nyborg_Svendborg = Road<Nyborg,Svendborg,50,0,14>;
