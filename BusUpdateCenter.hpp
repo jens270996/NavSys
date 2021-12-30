@@ -6,9 +6,12 @@
 
 class BusUpdateCenter{
     public:
+        BusUpdateCenter(){
+
+        };
         template <typename T>
-        void connect(T func_to_connect, int slotToConnect){
-            _signals.connect(T, int);
+        void connect(T funcToConnect, int slotToConnect){
+            _signals.connect(funcToConnect, int);
         }
         void handleUpdates(MapUpdater u){
             

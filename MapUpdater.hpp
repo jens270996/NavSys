@@ -16,5 +16,17 @@ class MapUpdater{
         //return updates.Update attributes
         return Update();
     }
+    Update jyllandUpdate(){
+        std::cout <<"Jylland update" << std::endl;
+        return Update();
+    }
+    Update fynUpdate(){
+        std::cout <<"Fyn update" << std::endl;
+        return Update();
+    }
+    Update Sjaelland(){
+        std::cout <<"Sjaelland update" << std::endl;
+        return Update();
+    }
 
 };

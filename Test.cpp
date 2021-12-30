@@ -1,9 +1,11 @@
+#include "BusUpdateCenter.hpp"
 #include <iostream>
-#include <boosts/signals2>
-
-    void f()
+#include <boost/signals2.hpp>
+#include "MapUpdater.hpp"
+    int f()
     {
         std::cout << "Hello" << std::endl;
+        return 2;
     }
     struct HelloWorld
     {
@@ -14,10 +16,17 @@
     };
 int main()
 {
+
+
+    BusUpdateCenter rute1;
+    MapUpdater map;
+    rute1.connect(&map.jyllandUpdate, 0);
     boost::signals2::signal<void ()> sig;
+
+
     HelloWorld hello;
-    sig.connect(&f);
-    sig.connec(hello);
+    sig.connect(1,&f);
+    sig.connect(0,hello);
     sig();
     return 0;
 }
