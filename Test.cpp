@@ -1,32 +1,32 @@
-#include "BusUpdateCenter.hpp"
 #include <iostream>
-#include <boost/signals2.hpp>
-#include "MapUpdater.hpp"
-    int f()
-    {
-        std::cout << "Hello" << std::endl;
-        return 2;
-    }
-    struct HelloWorld
-    {
-        void operator() () const{
-            std::cout << "hello, world!" << std::endl;
+#include <boost/signals2/signal.hpp>
+#include "BusUpdateCenter.hpp"
+#include "typeinfo"
+    
+//main update
+using namespace map_updater;
 
-        }
-    };
-int main()
+int main(int argc, char* argv[])
 {
+  RoadInformation* roadInformation = new RoadInformation(40, true, "missing");
+  RoadInformation* roadInformation2 = new RoadInformation(30, true, "Not missing");
+  Update* update = new Update(0, roadInformation);
+  
+  // // Update* updates = new Update(1, new RoadInformation(60, true, "missing 2"));
+  MapUpdater map;
+  BusUpdateCenter Jylland(map);
 
+    //Jylland.m_connection(MapUpdater::Update)
+    // std::cout <<map.getText()<< std::endl;
+    // std::cout <<map.getText() << std::endl;
 
-    BusUpdateCenter rute1;
-    MapUpdater map;
-    rute1.connect(&map.jyllandUpdate, 0);
-    boost::signals2::signal<void ()> sig;
+    // Jylland.m_connection = Jylland._mapUpdater.connect(boost::bind(&BusUpdateCenter::busUpdateJylland, Jylland));
+    
+    Jylland._mapUpdater.connect(boost::bind(&BusUpdateCenter::busUpdateJylland, Jylland));
+    Jylland._mapUpdater.connect(boost::bind(&BusUpdateCenter::busUpdateFyn, Jylland));
 
+    map.UpdateSignal(" Hej hej", update);
 
-    HelloWorld hello;
-    sig.connect(1,&f);
-    sig.connect(0,hello);
-    sig();
+    
     return 0;
 }
