@@ -15,13 +15,13 @@ namespace map_updater{
                 _isPassable = isPassable;
                 _message = message;
             }
-            double getTraversalTimeImpact(){
+            double getTraversalTimeImpact()const{
                 return _traversalTimeImpact;
             }
-            bool getIsPassable(){
+            bool getIsPassable()const{
                 return _isPassable;
             }
-            std::string getMessage(){
+            std::string getMessage()const{
                 return _message;
             }
         private:
@@ -32,24 +32,32 @@ namespace map_updater{
     }; 
     class Update{
         public:
-            Update(int roadId, RoadInformation& roadInformation):_roadInformation(roadInformation){
+            Update(int roadId, RoadInformation* roadInformation):_roadInformation(roadInformation){
+                std::cout<<"constructing"<<std::endl;
                 _roadId = roadId;
             }
-            double getTraversalTimeImpact(){
-                return _roadInformation.getTraversalTimeImpact();
+            Update(const Update& update)=delete;
+            Update& operator=(const Update& update) = delete;
+            Update(Update&& update) = delete;
+            Update& operator=(Update&& update) = delete ;
+            ~Update(){
+                delete _roadInformation;
+            };
+            double getTraversalTimeImpact()const{
+                return _roadInformation->getTraversalTimeImpact();
             }
-            bool getIsPassable(){
-                return _roadInformation.getIsPassable();
+            bool getIsPassable()const{
+                return _roadInformation->getIsPassable();
             }
-            std::string getMessage(){
-                return _roadInformation.getMessage();
+            std::string getMessage()const{
+                return _roadInformation->getMessage();
             }
-            int getRoadId(){
+            int getRoadId()const{
                 return _roadId;
             }
         private:
             int _roadId;
-            RoadInformation& _roadInformation;
+            RoadInformation* _roadInformation;
     };
 class MapUpdater 
 {
@@ -63,8 +71,7 @@ class MapUpdater
     {
         return m_sig.connect(subscriber);
     }
-    
-    void UpdateSignal( Update& update){
+    void UpdateSignal( Update&& update){
         std::cout<<"Update on road:"<<update.getRoadId()<<std::endl;
         m_sig(update);
     }
@@ -76,11 +83,11 @@ class MapUpdater
 
 class BusUpdateCenter{
     public:
-        typedef boost::signals2::signal<void(Update&)> _signal;
+        typedef boost::signals2::signal<void(const Update&)> _signal;
         BusUpdateCenter(MapUpdater &mapUpdater)
         {
-            std::function<void(Update& update)> func([this](Update& update){
-                this->UpdateSignals(update);
+            std::function<void(Update &update)> func([this](Update &update){
+                this->UpdateSignals(std::move(update));
             });
             mapUpdater.connect(func);
         }
@@ -91,7 +98,7 @@ class BusUpdateCenter{
                 m_sig[id].connect(subscriber);
             });
         }
-        void UpdateSignals(Update& update){
+        void UpdateSignals(Update&& update){
             std::cout<<"Updating on index:"<<update.getRoadId()<<std::endl;
             m_sig[update.getRoadId()](update);
         }

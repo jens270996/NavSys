@@ -30,7 +30,7 @@ private:
         private:
         Bus& _parent;
     } _busstop_functor;
-    void handleUpdate(Update update){
+    void handleUpdate(const Update& update){
         std::cout<<update.getMessage()<<std::endl;
     }
     std::vector<Update> _updates;
