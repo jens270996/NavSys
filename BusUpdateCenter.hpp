@@ -33,8 +33,19 @@ namespace map_updater{
     class Update{
         public:
             Update(int roadId, RoadInformation* roadInformation):_roadInformation(roadInformation){
-                std::cout<<"constructing"<<std::endl;
-                _roadId = roadId;
+                try{
+                    size_t tmp = roadId;
+                    _roadId = tmp;
+
+                }
+                catch(std::exception& e){
+                    std::cout << "Pointer exception thrown in Update constructor" << e.what() << std::endl;
+                    throw;
+                }
+                catch(...){
+
+                    std::cout << "Unknown Exception thrown in Update constructor" << std::endl;
+                }
             }
             Update(const Update& update)=delete;
             Update& operator=(const Update& update) = delete;
@@ -44,13 +55,28 @@ namespace map_updater{
                 delete _roadInformation;
             };
             double getTraversalTimeImpact()const{
-                return _roadInformation->getTraversalTimeImpact();
+                try{
+                   return _roadInformation->getTraversalTimeImpact();
+                }
+                catch(...){
+                    std::cout << "Exception thrown in getTraversalTimeImpact" << std::endl;
+                }
             }
-            bool getIsPassable()const{
-                return _roadInformation->getIsPassable();
+            bool getIsPassable() const{
+                try{   
+                    return _roadInformation->getIsPassable();
+                }
+                catch(...){
+                    std::cout << "Exception thrown in getIsPassable" << std::endl;
+                }
             }
-            std::string getMessage()const{
-                return _roadInformation->getMessage();
+            std::string getMessage() const{
+                try{
+                    return _roadInformation->getMessage();
+                }
+                catch(...){
+                    std::cout << "Exception thrown in getMessage" << std::endl;
+                }
             }
             int getRoadId()const{
                 return _roadId;
