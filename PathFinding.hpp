@@ -47,4 +47,17 @@ namespace Map{
         // std::enable_if_t<(TL::List_Contains<FROM,typename GRAPH::cities>::type::value && TL::List_Contains<TO,typename GRAPH::cities>::type::value)>
         typedef typename FindPath_Impl<FROM,TO,GRAPH,typename GetRoadsFromCity<FROM,GRAPH>::type,TL::List<>>::type type;
     };
+
+    template<typename GRAPH, typename... Points>
+    struct FindPaths{
+        typedef Path<> type;
+    };
+    template<typename GRAPH,typename FROM, typename TO,typename... Ts>
+    struct FindPaths<GRAPH,FROM,TO,Ts...>{
+        // std::enable_if_t<(TL::List_Contains<FROM,typename GRAPH::cities>::type::value && TL::List_Contains<TO,typename GRAPH::cities>::type::value)>
+        typedef Path_Impl<typename TL::List_Concatenate<
+        typename FindPath<FROM,TO,GRAPH>::type::list
+        ,typename FindPaths<GRAPH,TO,Ts...>::type::list>::type > type;
+    };
+
 }

@@ -1,12 +1,14 @@
 #pragma once
 #include "List.hpp"
 #include "Map.hpp"
-#include<array>
+#include <array>
+#include <vector>
 namespace Map{
     template<typename T, typename U = void>
     struct Path_Impl{};
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<(T::size>1)>>{
+        typedef T list;
         static const size_t size = T::size;
         typedef typename T::first::from from;
         typedef typename T::last::to to;
@@ -24,6 +26,7 @@ namespace Map{
     //Path with single road
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<T::size==1>>{
+        typedef T list;
         static const size_t size = T::size;
         typedef typename T::first::from from;
         typedef typename T::last::to to;
@@ -36,6 +39,7 @@ namespace Map{
     //Empty Path
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<T::size==0>>{
+        typedef T list;
         static const size_t size = T::size;
         typedef TL::List<> cities;
         static const int cost = 0;
@@ -52,6 +56,10 @@ namespace Map{
 
     template<typename... Ts>
     using Path = Path_Impl<TL::List<Ts...>>; //Path is a list of roads in the order they should be transversed.
+
+
+
+
 
     template<typename T>
     struct PathFunctions{};
@@ -74,6 +82,13 @@ namespace Map{
                 array[index++]=id;
             });
             return array;
+        }
+        static std::vector<size_t> getRoadIdVector(){
+            std::vector<size_t> vector;
+            ForEachRoad([&vector](size_t id, int cost, int weight){
+                vector.push_back(id);
+            });
+            return vector;
         }
 
         static void PrintFull(){

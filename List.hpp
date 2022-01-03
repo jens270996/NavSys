@@ -19,12 +19,9 @@ template <typename T>
     };
     struct Invalid_Type{};
 
-    //should never go here
     template <typename... Ts>
-    struct List
-    {
+    struct List{};
 
-    };
     template <typename T,typename... Ts>
     struct List<T,Ts...>
     {
@@ -33,7 +30,6 @@ template <typename T>
         typedef typename List_impl<T,Ts...>::first first;
         typedef List<Ts...> rest;
     };
-
 
     template <>
     struct List<>
@@ -64,6 +60,11 @@ template <typename T>
     struct List_Concatenate<T,List<>>{
         typedef List<T> type;
     };
+    //List and empty list
+    template<typename... Ts>
+    struct List_Concatenate<List<Ts...>,List<>>{
+        typedef List<Ts...> type;
+    };
     //List and type
     template<typename... Ts,typename U>
     struct List_Concatenate<List<Ts...>,U>{
@@ -88,6 +89,28 @@ template <typename T>
     struct List_Contains<T,List<>>
     {
         typedef std::false_type type;
+    };
+
+    template<typename T>
+    struct ListFunctions{};
+
+    template<typename T,typename... Ts>
+    struct ListFunctions<List<T,Ts...>>
+    {
+        template<typename Functor>
+        static constexpr void ForEach(Functor functor){
+            functor(T{});
+            ListFunctions<List<Ts...>>::ForEach(functor);
+        }
+    };
+
+    template<>
+    struct ListFunctions<List<>>
+    {
+        template<typename Functor>
+        static constexpr void ForEach(Functor functor){
+            return;
+        }
     };
 
 }
