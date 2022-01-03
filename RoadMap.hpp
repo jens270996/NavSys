@@ -96,6 +96,9 @@ namespace RoadMap{
     CREATE_BIDIRECTIONAL_ROAD(Aarhus,Grenaa,70,0,58,59)
     CREATE_BIDIRECTIONAL_ROAD(Randers,Grenaa,40,0,60,61)
     CREATE_BIDIRECTIONAL_ROAD(Randers,Aalborg,70,0,62,63)
+
+
+    #define NO_OF_ROADS 64
     using MapGraph = Map::MapGraph<
     TL::List<Copenhagen,Helsingoer,Roskilde,Koege,Slagelse,Kalundborg,Nyborg,Svendborg,Odense,Middelfart,Fredericia
         ,Esbjerg,Vejle,Horsens,Herning,Silkeborg,Skanderborg,Aarhus,Holstebro,Viborg,Randers,Grenaa,Aalborg>

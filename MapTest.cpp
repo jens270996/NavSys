@@ -8,11 +8,12 @@ int main(void){
     RoadInformation *roadInformation = new RoadInformation(40, true, "RoadInformation");
     BusUpdateCenter center(map);
     Bus<Aarhus,Odense,Slagelse> bus1(center);
-    Bus<Aarhus,Odense,Slagelse> bus2(center);
-    Bus<Aarhus,Odense,Slagelse> bus3(center);
-    Bus<Aarhus,Odense,Slagelse> bus4(center);
-    map.UpdateSignal(Update(37, roadInformation));
+    Bus<Herning,Middelfart,Nyborg> bus2(center);
+    Bus<Herning,Aalborg,Grenaa> bus3(center);
 
-    bus1.printPath();
+    std::cout<<"Hi from main"<<std::endl;
+    map.startUpdateGeneration();
+
+    while(1){}
     return 1;
 }
