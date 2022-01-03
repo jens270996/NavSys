@@ -34,28 +34,44 @@ namespace RoadMap{
     //Roads
     //From to weight cost id
 
+    template<size_t road_id>
+    struct Road_Information{
+        static const char* const from;
+        static const char* const to;
+    };
+
     #define CREATE_BIDIRECTIONAL_ROAD(FROM,TO,WEIGHT,COST,ID1,ID2)\
     using FROM ## _ ## TO = Road<FROM,TO,WEIGHT,COST,ID1>;\
     using TO ## _ ## FROM = Road<TO,FROM,WEIGHT,COST,ID2>;\
+    namespace{\
+        static const char from_ ## ID1 ## ID2 [] = #FROM ;\
+        static const char to_ ## ID1 ## ID2 [] = #TO ;\
+    }\
+    template<>\
+    struct Road_Information<ID1>\
+    {\
+        static const char* const from(){return from_ ## ID1 ## ID2 ;}\
+        static const char* const to(){ return to_ ## ID1 ## ID2 ; }\
+    };\
+    template<>\
+    struct Road_Information<ID2>\
+    {\
+        static const char* const from(){return to_ ## ID1 ## ID2 ;}\
+        static const char* const to(){return from_ ## ID1 ## ID2 ;}\
+    };\
+    
+
     //Sjælland
-    using Copenhagen_Helsingoer = Road<Copenhagen,Helsingoer,50,0,0>;
-    using Helsingoer_Copenhagen = Road<Helsingoer,Copenhagen,50,0,1>;
-    using Copenhagen_Roskilde = Road<Copenhagen,Roskilde,40,0,2>;
-    using Roskilde_Copenhagen = Road<Roskilde,Copenhagen,40,0,3>;
-    using Copenhagen_Koege = Road<Copenhagen,Koege,50,0,4>;
-    using Koege_Copenhagen = Road<Koege,Copenhagen,50,0,5>;
-    using Koege_Slagelse = Road<Koege,Slagelse,70,0,6>;
-    using Slagelse_Koege = Road<Slagelse,Koege,70,0,7>;
-    using Roskilde_Kalundborg = Road<Roskilde,Kalundborg,80,0,8>;
-    using Kalundborg_Roskilde = Road<Kalundborg,Roskilde,80,0,9>;
-    using Kalundborg_Slagelse = Road<Kalundborg,Slagelse,60,0,10>;
-    using Slagelse_Kalundborg = Road<Slagelse,Kalundborg,60,0,11>;
-    using Slagelse_Nyborg = Road<Slagelse,Nyborg,60,400,12>;
+    CREATE_BIDIRECTIONAL_ROAD(Copenhagen,Helsingoer,50,0,0,1)
+    CREATE_BIDIRECTIONAL_ROAD(Copenhagen,Roskilde,40,0,2,3)
+    CREATE_BIDIRECTIONAL_ROAD(Copenhagen,Koege,50,0,4,5)
+    CREATE_BIDIRECTIONAL_ROAD(Koege,Slagelse,70,0,6,7)
+    CREATE_BIDIRECTIONAL_ROAD(Roskilde,Kalundborg,80,0,8,9)
+    CREATE_BIDIRECTIONAL_ROAD(Kalundborg,Slagelse,60,0,10,11)
+    CREATE_BIDIRECTIONAL_ROAD(Slagelse,Nyborg,60,400,12,13)
 
     //Fyn
-    using Nyborg_Slagelse = Road<Nyborg,Slagelse,60,400,13>;
-    using Nyborg_Svendborg = Road<Nyborg,Svendborg,50,0,14>;
-    using Svendborg_Nyborg = Road<Svendborg,Nyborg,50,0,15>;
+    CREATE_BIDIRECTIONAL_ROAD(Nyborg,Svendborg,50,0,14,15)
     CREATE_BIDIRECTIONAL_ROAD(Nyborg,Odense,40,0,16,17)
     CREATE_BIDIRECTIONAL_ROAD(Svendborg,Odense,60,0,18,19)
     CREATE_BIDIRECTIONAL_ROAD(Odense,Middelfart,60,0,20,21)
@@ -65,22 +81,21 @@ namespace RoadMap{
     CREATE_BIDIRECTIONAL_ROAD(Esbjerg,Herning,90,0,28,29)
     CREATE_BIDIRECTIONAL_ROAD(Vejle,Herning,70,0,30,31)
     CREATE_BIDIRECTIONAL_ROAD(Vejle,Horsens,20,0,32,33)
-    CREATE_BIDIRECTIONAL_ROAD(Horsens,Herning,20,0,32,33)
-    CREATE_BIDIRECTIONAL_ROAD(Horsens,Skanderborg,20,0,34,35)
-    CREATE_BIDIRECTIONAL_ROAD(Skanderborg,Aarhus,20,0,36,37)
-    CREATE_BIDIRECTIONAL_ROAD(Herning,Silkeborg,30,0,38,39)
-    CREATE_BIDIRECTIONAL_ROAD(Silkeborg,Aarhus,30,0,40,41)
-    CREATE_BIDIRECTIONAL_ROAD(Herning,Viborg,30,0,42,43)
-    CREATE_BIDIRECTIONAL_ROAD(Silkeborg,Viborg,100,0,44,45)
-    CREATE_BIDIRECTIONAL_ROAD(Aarhus,Viborg,40,0,46,47)
-    CREATE_BIDIRECTIONAL_ROAD(Aarhus,Randers,30,0,48,49)
-    CREATE_BIDIRECTIONAL_ROAD(Randers,Viborg,20,0,50,51)
-    CREATE_BIDIRECTIONAL_ROAD(Herning,Holstebro,20,0,52,53)
-    CREATE_BIDIRECTIONAL_ROAD(Viborg,Holstebro,30,0,54,55)
-    CREATE_BIDIRECTIONAL_ROAD(Aarhus,Grenaa,70,0,56,57)
-    CREATE_BIDIRECTIONAL_ROAD(Randers,Grenaa,40,0,58,59)
-    CREATE_BIDIRECTIONAL_ROAD(Randers,Aalborg,70,0,60,61)
-
+    CREATE_BIDIRECTIONAL_ROAD(Horsens,Herning,20,0,34,35)
+    CREATE_BIDIRECTIONAL_ROAD(Horsens,Skanderborg,20,0,36,37)
+    CREATE_BIDIRECTIONAL_ROAD(Skanderborg,Aarhus,20,0,38,39)
+    CREATE_BIDIRECTIONAL_ROAD(Herning,Silkeborg,30,0,40,41)
+    CREATE_BIDIRECTIONAL_ROAD(Silkeborg,Aarhus,30,0,42,43)
+    CREATE_BIDIRECTIONAL_ROAD(Herning,Viborg,30,0,44,45)
+    CREATE_BIDIRECTIONAL_ROAD(Silkeborg,Viborg,100,0,46,47)
+    CREATE_BIDIRECTIONAL_ROAD(Aarhus,Viborg,40,0,48,49)
+    CREATE_BIDIRECTIONAL_ROAD(Aarhus,Randers,30,0,50,51)
+    CREATE_BIDIRECTIONAL_ROAD(Randers,Viborg,20,0,52,53)
+    CREATE_BIDIRECTIONAL_ROAD(Herning,Holstebro,20,0,54,55)
+    CREATE_BIDIRECTIONAL_ROAD(Viborg,Holstebro,30,0,56,57)
+    CREATE_BIDIRECTIONAL_ROAD(Aarhus,Grenaa,70,0,58,59)
+    CREATE_BIDIRECTIONAL_ROAD(Randers,Grenaa,40,0,60,61)
+    CREATE_BIDIRECTIONAL_ROAD(Randers,Aalborg,70,0,62,63)
     using MapGraph = Map::MapGraph<
     TL::List<Copenhagen,Helsingoer,Roskilde,Koege,Slagelse,Kalundborg,Nyborg,Svendborg,Odense,Middelfart,Fredericia
         ,Esbjerg,Vejle,Horsens,Herning,Silkeborg,Skanderborg,Aarhus,Holstebro,Viborg,Randers,Grenaa,Aalborg>
