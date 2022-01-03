@@ -3,7 +3,6 @@
 #include <boost/bind/bind.hpp>
 #include <iostream>
 #include <list>
-#include <tuple>
 using namespace boost::placeholders;
 //template <class T>
 namespace map_updater{
@@ -15,16 +14,6 @@ namespace map_updater{
                 _traversalTimeImpact = traversalTimeImpact;
                 _isPassable = isPassable;
                 _message = message;
-            }
-            RoadInformation(){
-
-            }
-            RoadInformation(double traversalTimeImpact, bool isPassable){
-                _traversalTimeImpact = traversalTimeImpact;
-                _isPassable = isPassable;
-            }
-            RoadInformation(double traversalTimeImpact){
-                _traversalTimeImpact = traversalTimeImpact;
             }
             double getTraversalTimeImpact(){
                 return _traversalTimeImpact;
@@ -43,31 +32,28 @@ namespace map_updater{
     }; 
     class Update{
         public:
-            Update(){
-            }
-            Update(int roadId, RoadInformation* roadInformation){
-                _roadId = _roadId;
-                _roadInformation = roadInformation;
+            Update(int roadId, RoadInformation& roadInformation):_roadInformation(roadInformation){
+                _roadId = roadId;
             }
             double getTraversalTimeImpact(){
-                return _roadInformation->getTraversalTimeImpact();
+                return _roadInformation.getTraversalTimeImpact();
             }
             bool getIsPassable(){
-                return _roadInformation->getIsPassable();
+                return _roadInformation.getIsPassable();
             }
             std::string getMessage(){
-                return _roadInformation->getMessage();
+                return _roadInformation.getMessage();
             }
             int getRoadId(){
                 return _roadId;
             }
         private:
             int _roadId;
-            RoadInformation* _roadInformation;
+            RoadInformation& _roadInformation;
     };
 class MapUpdater 
 {
-    typedef boost::signals2::signal<void(Update)> _signal;
+    typedef boost::signals2::signal<void(Update&)> _signal;
 
     public:
     MapUpdater(){
@@ -79,6 +65,7 @@ class MapUpdater
     }
     
     void UpdateSignal( Update& update){
+        std::cout<<"Update on road:"<<update.getRoadId()<<std::endl;
         m_sig(update);
     }
 
@@ -89,45 +76,27 @@ class MapUpdater
 
 class BusUpdateCenter{
     public:
-        typedef boost::signals2::signal<void(Update)> _signal;
+        typedef boost::signals2::signal<void(Update&)> _signal;
         BusUpdateCenter(MapUpdater &mapUpdater)
         {
-            m_sig = std::make_shared<std::array <_signal, 1000>>();
-            mapUpdater.connect(boost::bind(&map_updater::BusUpdateCenter::UpdateSignals, this, boost::placeholders::_1));
+            std::function<void(Update& update)> func([this](Update& update){
+                this->UpdateSignals(update);
+            });
+            mapUpdater.connect(func);
         }
-        // BusUpdateCenter(const BusUpdateCenter& busUpdateCenter){
-        //     this->m_sig = m_sig;
-
-
-        // }
-        void connect(const _signal::slot_type &subscriber, std::list<int> roadId)
+        void connect(const _signal::slot_type &subscriber, std::vector<size_t> roadId)
         {
-            auto tuple = std::make_tuple(subscriber, roadId);
-            for(int id : roadId){
-
-                (*m_sig)[id].connect(subscriber);
-            }
-
+            std::for_each(roadId.begin(),roadId.end(),[&](size_t id){
+                std::cout<<"Connecting on index:"<<id<<std::endl;
+                m_sig[id].connect(subscriber);
+            });
         }
         void UpdateSignals(Update& update){
-            (*m_sig)[update.getRoadId()](update);
+            std::cout<<"Updating on index:"<<update.getRoadId()<<std::endl;
+            m_sig[update.getRoadId()](update);
         }
         
     private:
-        std::shared_ptr<std::array <_signal, 1000>> m_sig;
-
+        std::array <_signal, 1000> m_sig;
     }; 
-    class TestObject{
-        public:
-            TestObject(BusUpdateCenter& busUpdateCenter)
-            :_busUpdateCenter(busUpdateCenter)
-            {
-            }
-                BusUpdateCenter& _busUpdateCenter;
-            void TheFunction(){
-                    std::cout << "Hello from the function" << std::endl;
-
-
-            }
-    };
 }

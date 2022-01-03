@@ -3,15 +3,16 @@
 #include "RoadMap.hpp"
 #include "PathFinding.hpp"
 #include "List.hpp"
+#include "BusUpdateCenter.hpp"
 #include <functional>
-
+using namespace map_updater;
 template<typename... ROUTE_POINTS>
 class Bus{
     typedef typename Map::FindPaths<Map::RoadMap::MapGraph,ROUTE_POINTS...>::type path;
 public:
     Bus(BusUpdateCenter& update_center):_busstop_functor(*this){
         _path_vector = Map::PathFunctions<path>::getRoadIdVector();
-        update_center.connect(std::bind(Bus::handleUpdate,this,std::placeholders::_1));
+        update_center.connect(std::bind(&Bus::handleUpdate,this,std::placeholders::_1),_path_vector);
         //get city ids:
         TL::ListFunctions<TL::List<ROUTE_POINTS...>>::ForEach(_busstop_functor);
     } //also BusUpdateCenter, to connect to slots
@@ -30,7 +31,7 @@ private:
         Bus& _parent;
     } _busstop_functor;
     void handleUpdate(Update update){
-
+        std::cout<<update.getMessage()<<std::endl;
     }
     std::vector<Update> _updates;
     std::vector<size_t> _path_vector;
