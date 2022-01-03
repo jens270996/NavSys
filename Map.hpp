@@ -8,7 +8,6 @@ namespace Map{
     struct Road{
         typedef Tfrom from;
         typedef Tto to;
-        // add extra weight, to allow for updated path_finding.
         static const int weight = Weight;
         static const int cost = Cost;
         static const size_t id = ID;
