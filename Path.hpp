@@ -19,11 +19,6 @@ namespace Map{
         static const int weight = T::first::weight + Path_Impl<typename T::rest>::weight;
     };
 
-    template<typename T, typename U>
-    struct Path_Comparer{
-        typedef std::conditional_t<T::weight<=U::weight,T,U> shortest;
-    };
-
     //Path with single road
     template<typename T>
     struct Path_Impl<T,std::enable_if_t<T::size==1>>{
@@ -36,7 +31,6 @@ namespace Map{
         static const int cost = T::first::cost;
         static const int weight= T::first::weight;
     };
-
 
     //Empty Path
     template<typename T>
@@ -59,9 +53,11 @@ namespace Map{
     template<typename... Ts>
     using Path = Path_Impl<TL::List<Ts...>>; //Path is a list of roads in the order they should be transversed.
 
-
-
-
+    template<typename T, typename U>
+    struct Path_Comparer{
+        typedef std::conditional_t<T::weight<=U::weight,T,U> shortest;
+    };
+    
     //Empty primary
     template<typename T>
     struct PathFunctions{};
