@@ -3,7 +3,6 @@
 #include <algorithm>
 #include "List.hpp"
 namespace Map{
-    //Traits to determine if road has cost or not?
     template <typename Tfrom, typename Tto, int Weight, int Cost,size_t ID>
     struct Road{
         typedef Tfrom from;

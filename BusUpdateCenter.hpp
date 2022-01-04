@@ -31,14 +31,20 @@ namespace map_updater{
                 
             }
             RoadInformation& operator=(const RoadInformation& rhs){
-                _traversalTimeImpact = rhs._traversalTimeImpact;
-                _isPassable = rhs._isPassable;
-                _message = rhs._message;
+                if(this!=&rhs){
+                    _traversalTimeImpact = rhs._traversalTimeImpact;
+                    _isPassable = rhs._isPassable;
+                    _message = rhs._message;
+                }
+                return *this;
             }
             RoadInformation& operator=(RoadInformation&& rhs){
-                _traversalTimeImpact = std::move(rhs._traversalTimeImpact);
-                _isPassable = std::move(rhs._isPassable);
-                _message = std::move(rhs._message);
+                if(this!=&rhs){
+                    _traversalTimeImpact = std::move(rhs._traversalTimeImpact);
+                    _isPassable = std::move(rhs._isPassable);
+                    _message = std::move(rhs._message);
+                }
+                return *this;
             }
             double getTraversalTimeImpact()const{
                 return _traversalTimeImpact;
