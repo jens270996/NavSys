@@ -17,14 +17,6 @@ namespace Map{
         static const size_t id = ID;
     };
 
-    //Trait with city names?? Specific names must be defined in global scope?
-    // template <typename T>
-    // struct City_Traits{
-    //     static const char name* = "Unknown";
-    // };
-
-    // Template aliases
-
     template <typename TCities, typename TRoads>
     class MapGraph{
     public:

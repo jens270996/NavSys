@@ -36,8 +36,8 @@ namespace RoadMap{
 
     template<size_t road_id>
     struct Road_Information{
-        static const char* const from;
-        static const char* const to;
+        static const char* const from();
+        static const char* const to();
     };
 
     #define CREATE_BIDIRECTIONAL_ROAD(FROM,TO,WEIGHT,COST,ID1,ID2)\

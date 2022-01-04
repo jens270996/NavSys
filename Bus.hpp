@@ -11,13 +11,16 @@ class Bus{
     typedef typename Map::FindPaths<Map::RoadMap::MapGraph,ROUTE_POINTS...>::type path;
 public:
     Bus(BusUpdateCenter& update_center):_busstop_functor(*this){
+
         _path_vector = Map::PathFunctions<path>::getRoadIdVector();
+
         update_center.connect(std::bind(&Bus::handleUpdate,this,std::placeholders::_1)
                             ,std::bind(&Bus::handleExpire
                             ,this,std::placeholders::_1),_path_vector);
         //get city ids:
         TL::ListFunctions<TL::List<ROUTE_POINTS...>>::ForEach(_busstop_functor);
     } //also BusUpdateCenter, to connect to slots
+
     void printPath(){ Map::PathFunctions<path>::PrintFull();}
     std::vector<size_t> getPath() { return _path_vector; }
     std::vector<int>    getStops(){ return _route_points;}

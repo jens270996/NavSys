@@ -1,8 +1,6 @@
 #pragma once
 #include<type_traits>
 
-//inspired by https://www.codeproject.com/Articles/1077852/TypeLists-and-a-TypeList-Toolbox-via-Variadic-Temp
-
 namespace TL{
 
     template <typename T,typename... Ts>
@@ -71,7 +69,7 @@ template <typename T>
         typedef List<Ts...,U> type;
     };
 
-    //base templates
+    //base template
     template<typename T, typename U, typename = void>
     struct List_Contains{};
 
