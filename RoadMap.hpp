@@ -10,7 +10,6 @@ namespace RoadMap{
     using Helsingoer = City<3000>;
     using Roskilde = City<4000>;
     using Koege = City<4600>;
-    // using Naestved = City<4700>;
     using Slagelse = City<4200>;
     using Kalundborg = City<4400>;
     using Nyborg = City<5800>;
@@ -18,7 +17,6 @@ namespace RoadMap{
     using Odense = City<5000>;
     using Middelfart = City<5500>;
     using Fredericia = City<7000>;
-    // using Haderslev = City<6100>;
     using Esbjerg = City<6700>;
     using Vejle = City<7100>;
     using Horsens = City<8700>;
@@ -33,35 +31,11 @@ namespace RoadMap{
     using Aalborg = City<9000>;
 
     //Roads
-    //From to weight cost id
 
-    template<size_t road_id>
-    struct Road_Information{
-        static const char* const from();
-        static const char* const to();
-    };
-
+    //Macro to create road types
     #define CREATE_BIDIRECTIONAL_ROAD(FROM,TO,WEIGHT,COST,ID1,ID2)\
     using FROM ## _ ## TO = Road<FROM,TO,WEIGHT,COST,ID1>;\
-    using TO ## _ ## FROM = Road<TO,FROM,WEIGHT,COST,ID2>;\
-    namespace{\
-        static const char from_ ## ID1 ## ID2 [] = #FROM ;\
-        static const char to_ ## ID1 ## ID2 [] = #TO ;\
-    }\
-    template<>\
-    struct Road_Information<ID1>\
-    {\
-        static const char* const from(){return from_ ## ID1 ## ID2 ;}\
-        static const char* const to(){ return to_ ## ID1 ## ID2 ; }\
-    };\
-    template<>\
-    struct Road_Information<ID2>\
-    {\
-        static const char* const from(){return to_ ## ID1 ## ID2 ;}\
-        static const char* const to(){return from_ ## ID1 ## ID2 ;}\
-    };\
-    
-
+    using TO ## _ ## FROM = Road<TO,FROM,WEIGHT,COST,ID2>;
     //Sjælland
     CREATE_BIDIRECTIONAL_ROAD(Copenhagen,Helsingoer,50,0,0,1)
     CREATE_BIDIRECTIONAL_ROAD(Copenhagen,Roskilde,40,0,2,3)
@@ -97,7 +71,6 @@ namespace RoadMap{
     CREATE_BIDIRECTIONAL_ROAD(Aarhus,Grenaa,70,0,58,59)
     CREATE_BIDIRECTIONAL_ROAD(Randers,Grenaa,40,0,60,61)
     CREATE_BIDIRECTIONAL_ROAD(Randers,Aalborg,70,0,62,63)
-
 
     #define NO_OF_ROADS 64
     using MapGraph = Map::MapGraph<

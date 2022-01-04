@@ -13,7 +13,7 @@ namespace Map{
         static const size_t size = T::size;
         typedef typename T::first::from from;
         typedef typename T::last::to to;
-        //Start of each road + 
+        //Start of first road +  cities in path with rest.
         typedef typename TL::List_Concatenate_t<from, typename Path_Impl<typename T::rest>::cities> cities;
         static const int cost = T::first::cost + Path_Impl<typename T::rest>::cost;
         static const int weight = T::first::weight + Path_Impl<typename T::rest>::weight;
@@ -31,6 +31,7 @@ namespace Map{
         static const size_t size = T::size;
         typedef typename T::first::from from;
         typedef typename T::last::to to;
+        //From and to for last road. Since a path goes through number of roads +1 cities.
         typedef TL::List<from,to> cities;
         static const int cost = T::first::cost;
         static const int weight= T::first::weight;
@@ -61,7 +62,7 @@ namespace Map{
 
 
 
-
+    //Empty primary
     template<typename T>
     struct PathFunctions{};
 
@@ -69,21 +70,13 @@ namespace Map{
     template<typename T,typename... Ts>
     struct PathFunctions<Path_Impl<TL::List<T,Ts...>>>{
         //Functor must take a road id (size_t), cost (int) and weight(int) as argument.
-        // https://en.cppreference.com/w/cpp/types/result_of notes
         template<typename Functor>
         static constexpr void ForEachRoad(Functor functor){
 
             functor(T::id,T::cost,T::weight);
             PathFunctions<Path_Impl<TL::List<Ts...>>>::ForEachRoad(functor);
         }
-        static std::array<size_t,TL::List<T,Ts...>::size> getRoadIdArray(){
-            std::array<size_t,TL::List<T,Ts...>::size> array;
-            int index=0;
-            ForEachRoad([&array,&index](size_t id, int cost, int weight){
-                array[index++]=id;
-            });
-            return array;
-        }
+        //Uses ForEachRoad to extract road ids in a vector.
         static std::vector<size_t> getRoadIdVector(){
             std::vector<size_t> vector;
             ForEachRoad([&vector](size_t id, int cost, int weight){
@@ -109,6 +102,7 @@ namespace Map{
         static void PrintFull(){
             std::cout<<"Empty Path..."<<std::endl;
         }
+        //base case for ForEachRoad func
         template<typename Functor>
         static void ForEachRoad(Functor functor){
             return;

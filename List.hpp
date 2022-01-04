@@ -13,6 +13,7 @@ namespace TL{
     struct List<T,Ts...>
     {
         static const size_t size = sizeof...(Ts)+1;
+        //Use T if only one element, otherwise recursive call to List::last without first element.
         typedef std::conditional_t<size==1,T,typename List<Ts...>::last> last;
         typedef T first;
         typedef List<Ts...> rest;
@@ -65,16 +66,19 @@ namespace TL{
     template<typename T, typename U, typename = void>
     struct List_Contains{};
 
+    //T and first type are different
     template<typename T, typename U, typename... Ts>
-    struct List_Contains<T,List<U,Ts...>, std::enable_if_t<!std::is_same<T,U>::value>>
+    struct List_Contains<T,List<U,Ts...>>
     {
         typedef  typename List_Contains<T,List<Ts...>>::type type;
     };
+    //T and first type are same
     template<typename T, typename... Ts>
     struct List_Contains<T,List<T,Ts...>>
     {
         typedef std::true_type type;
     };
+    // Compared with all types in list, without finding T
     template<typename T>
     struct List_Contains<T,List<>>
     {
@@ -93,6 +97,7 @@ namespace TL{
     template<typename T,typename... Ts>
     struct ListFunctions<List<T,Ts...>>
     {
+        //Apply functor to instance of every type in typelist.
         template<typename Functor>
         static constexpr void ForEach(Functor functor){
             functor(T{});
