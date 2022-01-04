@@ -9,6 +9,9 @@
 #include "RoadMap.hpp"
 namespace BusRouter{
 namespace BusUpdate{
+
+    // It is the signal to the class BusUpdateCenter. 
+    // It delegates all information about incoming roadInformation to the slots who are connected 
     class MapUpdater 
     {
         typedef boost::signals2::signal<void(Update&)> _signal;
@@ -17,11 +20,14 @@ namespace BusUpdate{
         public:
         MapUpdater():update_id{0}{
         }
+        // Destructor waits to all threads are done with execution
         ~MapUpdater(){
             run=false;
             if(update_thread.joinable())
                 update_thread.join();
         }
+
+        //It is the method who Generate randomised roadInformation
         void startUpdateGeneration(){
 
             run=true;
@@ -50,16 +56,18 @@ namespace BusUpdate{
                 }
             });
         };
-
+        // Connect the subscribers to the MapUpdaters signals
         void connect(const _signal::slot_type &subscriber,const _removal_signal::slot_type &removal_subscriber)
         {
             exp_sig.connect(removal_subscriber);
             m_sig.connect(subscriber);
         }
         private:
+        // Performing the signal 
         void UpdateSignal( Update&& update){
             m_sig(update);
         }
+        // Performing the signal
         void ExpireSignal( UpdateExpiration&& update){
             exp_sig(update);
         }
