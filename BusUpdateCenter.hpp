@@ -7,6 +7,7 @@
 #include <random>
 #include <thread>
 #include <mutex>
+#include <atomic>
 using namespace boost::placeholders;
 //template <class T>
 namespace map_updater{
