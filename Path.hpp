@@ -13,7 +13,7 @@ namespace Map{
         typedef typename T::first::from from;
         typedef typename T::last::to to;
         //Start of each road + 
-        typedef typename TL::List_Concatenate<from, typename Path_Impl<typename T::rest>::cities>::type cities;
+        typedef typename TL::List_Concatenate_t<from, typename Path_Impl<typename T::rest>::cities> cities;
         static const int cost = T::first::cost + Path_Impl<typename T::rest>::cost;
         static const int weight = T::first::weight + Path_Impl<typename T::rest>::weight;
     };

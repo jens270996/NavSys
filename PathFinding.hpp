@@ -21,7 +21,7 @@ namespace Map{
     //To and from are different & Next city is not in path
     template<typename FROM,typename TO,typename GRAPH,typename ROAD, typename... ROADS, typename... PATHS>
     struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
-    std::enable_if_t<!std::is_same<FROM,TO>::value && !TL::List_Contains<typename ROAD::to, typename Path<PATHS...>::cities>::type::value>
+    std::enable_if_t<!std::is_same<FROM,TO>::value && !TL::List_Contains_v<typename ROAD::to, typename Path<PATHS...>::cities>>
     >{
         //helper defs - should go?
         typedef typename ROAD::to NextCity;
@@ -36,7 +36,7 @@ namespace Map{
     //To and from are different & Next city is in path
     template<typename FROM,typename TO,typename GRAPH,typename ROAD, typename... ROADS, typename... PATHS>
     struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
-    std::enable_if_t<!std::is_same<FROM,TO>::value && TL::List_Contains<typename ROAD::to, typename Path<PATHS...>::cities>::type::value>
+    std::enable_if_t<!std::is_same<FROM,TO>::value && TL::List_Contains_v<typename ROAD::to, typename Path<PATHS...>::cities>>
     >{
         //If next city is already in path, skip to avoid infinite loops.
         typedef typename FindPath_Impl<FROM,TO,GRAPH,TL::List<ROADS...>,TL::List<PATHS...>>::type type;

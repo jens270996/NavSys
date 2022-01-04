@@ -57,6 +57,9 @@ namespace TL{
         typedef List<Ts...,U> type;
     };
 
+    template< typename T,typename U >
+    using List_Concatenate_t = typename List_Concatenate<T,U>::type;
+
     //base template
     template<typename T, typename U, typename = void>
     struct List_Contains{};
@@ -76,6 +79,12 @@ namespace TL{
     {
         typedef std::false_type type;
     };
+
+    template< typename T, typename U, typename V = void >
+    using List_Contains_t = typename List_Contains<T,U,V>::type;
+
+    template< typename T, typename U, typename V = void >
+    inline constexpr bool List_Contains_v = List_Contains<T,U,V>::type::value;
 
     template<typename T>
     struct ListFunctions{};
