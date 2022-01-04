@@ -116,6 +116,18 @@ namespace map_updater{
         int _roadId;
         std::shared_ptr<const RoadInformation> _roadInformation;
     };
+    template<typename T>
+    struct AccumulationTraits{
+    };
+    template<>
+    struct AccumulationTraits<Update>{
+        int operator()(int&& sum, const Update & update){
+            return sum+=update.getTraversalTimeImpact();
+        }
+        typedef float AccT;
+        static AccT zero(){return 0.0;}
+    };
+
 class MapUpdater 
 {
     typedef boost::signals2::signal<void(Update&)> _signal;
@@ -135,10 +147,10 @@ class MapUpdater
         update_thread=std::thread([&](){
             std::default_random_engine rand_gen;
             std::uniform_int_distribution<int> road_id_generator(0,NO_OF_ROADS-1);
-            std::normal_distribution<float> delay_generator(20,10);
+            std::uniform_int_distribution<int> delay_generator(5,50);
             std::bernoulli_distribution blocked_generator(0.1);
             std::string msg = "Default msg.";
-            std::uniform_int_distribution<int> sleep_generator(1,15);
+            std::uniform_int_distribution<int> sleep_generator(1,2);
             std::bernoulli_distribution add_or_remove_generator(0.5);
             while(run){
                 std::this_thread::sleep_for (std::chrono::seconds(sleep_generator(rand_gen)));
@@ -149,14 +161,10 @@ class MapUpdater
                     update_deque.push_front(std::pair<unsigned,int>(update_id++,road_id));
                 }
                 else if(update_deque.size()>0){
-                    std::cout<<"Hi from remove"<<std::endl;
                     //remove update
                     std::uniform_int_distribution<int> removal_id_generator(0,update_deque.size()-1);
-                    std::cout<<"Hi from remove"<<std::endl;
                     std::deque<std::pair<unsigned,int>>::iterator it=update_deque.begin()+removal_id_generator(rand_gen);
-                    std::cout<<"Hi from remove"<<std::endl;
                     ExpireSignal(UpdateExpiration(it->first,it->second));
-                    std::cout<<"Hi from remove"<<std::endl;
                 }
             }
         });
@@ -169,11 +177,9 @@ class MapUpdater
     }
     private:
     void UpdateSignal( Update&& update){
-        std::cout<<"Update on road:"<<update.getRoadId()<<std::endl;
         m_sig(update);
     }
     void ExpireSignal( UpdateExpiration&& update){
-        std::cout<<"Update expiration on road:"<<update.road_id<<std::endl;
         exp_sig(update);
     }
     std::thread update_thread;
@@ -203,17 +209,14 @@ class BusUpdateCenter{
         void connect(const _signal::slot_type &subscriber, const _removal_signal::slot_type &exp_subscriber,std::vector<size_t> roadId)
         {
             std::for_each(roadId.begin(),roadId.end(),[&](size_t id){
-                std::cout<<"Connecting on index:"<<id<<std::endl;
                 m_sig[id].connect(subscriber);
                 exp_sig[id].connect(exp_subscriber);
             });
         }
         void UpdateSignals(Update&& update){
-            std::cout<<"Updating on index:"<<update.getRoadId()<<std::endl;
             m_sig[update.getRoadId()](update);
         }
         void UpdateSignals(UpdateExpiration&& update){
-            std::cout<<"Updating on index:"<<update.road_id<<std::endl;
             exp_sig[update.road_id](update);
         }
         

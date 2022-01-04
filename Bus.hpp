@@ -10,7 +10,7 @@ template<typename... ROUTE_POINTS>
 class Bus{
     typedef typename Map::FindPaths<Map::RoadMap::MapGraph,ROUTE_POINTS...>::type path;
 public:
-    Bus(BusUpdateCenter& update_center):_busstop_functor(*this){
+    Bus(BusUpdateCenter& update_center, std::string name):_busStopFunctor(*this),_name(name){
 
         _path_vector = Map::PathFunctions<path>::getRoadIdVector();
 
@@ -18,10 +18,17 @@ public:
                             ,std::bind(&Bus::handleExpire
                             ,this,std::placeholders::_1),_path_vector);
         //get city ids:
-        TL::ListFunctions<TL::List<ROUTE_POINTS...>>::ForEach(_busstop_functor);
-    } //also BusUpdateCenter, to connect to slots
+        TL::ListFunctions<TL::List<ROUTE_POINTS...>>::ForEach(_busStopFunctor);
+        printPath();
+    }
 
-    void printPath(){ Map::PathFunctions<path>::PrintFull();}
+    void printPath(){ 
+        std::cout<<std::endl<<"===================================================================================="<<std::endl;
+        std::cout<<"Bus route for bus with name: "<<_name<<std::endl;
+        Map::PathFunctions<path>::PrintFull();
+        std::cout<<"===================================================================================="<<std::endl<<std::endl;
+    }
+
     std::vector<size_t> getPath() { return _path_vector; }
     std::vector<int>    getStops(){ return _route_points;}
 private:
@@ -34,22 +41,33 @@ private:
         }
         private:
         Bus& _parent;
-    } _busstop_functor;
+    } _busStopFunctor;
+
+
+    void printDelay(int road_number)const{
+        typedef std::remove_const_t<std::remove_reference_t<decltype(_updates.front())>> DecltypeShowOff;
+        std::cout<<std::endl<<"===================================================================================="<<std::endl;
+        std::cout<<"Bus route: "<<_name<<" received update for road with id: "<<road_number<<std::endl;
+        std::cout<<"Total delay is now: "<<std::accumulate(_updates.begin(),_updates.end(),AccumulationTraits<DecltypeShowOff>::zero(),AccumulationTraits<DecltypeShowOff>{})<<std::endl;
+        std::cout<<"===================================================================================="<<std::endl;
+    }
+
     void handleUpdate(const Update& update){
         _updates.push_back(std::move(update));
-        std::cout<<_updates.back().getMessage()<<std::endl;
+        printDelay(update.getRoadId());
     }
     void handleExpire(const UpdateExpiration& update){
         //find matching id and remove
-        std::cout<<"Update with id expired: "<<update.road_id<<std::endl;
         for(auto it=_updates.begin();it!=_updates.end();it++){
             if(it->getUpdateId()==update.update_id){
-                std::cout<<"Removing"<<std::endl;
                 _updates.erase(it);
                 break;
             }
         }
+        printDelay(update.road_id);
+
     }
+    std::string _name;
     std::list<Update> _updates;
     std::vector<size_t> _path_vector;
     std::vector<int> _route_points;
