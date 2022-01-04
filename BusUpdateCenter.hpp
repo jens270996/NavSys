@@ -19,6 +19,27 @@ namespace map_updater{
                 _isPassable = isPassable;
                 _message = message;
             }
+            RoadInformation(RoadInformation&& rhs){
+                _traversalTimeImpact = std::move(rhs._traversalTimeImpact);
+                _isPassable = std::move(rhs._isPassable);
+                _message = std::move(rhs._message);
+            }
+            RoadInformation(const RoadInformation& rhs){
+                _traversalTimeImpact = rhs._traversalTimeImpact;
+                _isPassable = rhs._isPassable;
+                _message = rhs._message;
+                
+            }
+            RoadInformation& operator=(const RoadInformation& rhs){
+                _traversalTimeImpact = rhs._traversalTimeImpact;
+                _isPassable = rhs._isPassable;
+                _message = rhs._message;
+            }
+            RoadInformation& operator=(RoadInformation&& rhs){
+                _traversalTimeImpact = std::move(rhs._traversalTimeImpact);
+                _isPassable = std::move(rhs._isPassable);
+                _message = std::move(rhs._message);
+            }
             double getTraversalTimeImpact()const{
                 return _traversalTimeImpact;
             }
@@ -41,19 +62,19 @@ namespace map_updater{
     };
     class Update{
         public:
-            Update(int updateId, int roadId, RoadInformation* roadInformation):_updateId{updateId},_roadInformation(roadInformation){
-                _roadId = roadId;
-            }
+            template<typename... RIs>
+            Update(int updateId, int roadId, RIs... ris)
+            :_updateId{updateId},_roadId{roadId},
+            _roadInformation{std::make_shared<RoadInformation>(std::forward<RIs>(ris)...)}{}
+
             Update(Update&& update) noexcept
             :_updateId{std::move(update._updateId)},_roadId{std::move(update._roadId)},_roadInformation{update._roadInformation}{
             };
-            Update(const Update& update):_updateId{update._updateId},_roadId{update._roadId},_roadInformation{new RoadInformation(*(update._roadInformation))}{
+            Update(const Update& update):_updateId{update._updateId},_roadId{update._roadId},_roadInformation{update._roadInformation}{
             };
             Update& operator=(const Update& update) = delete;
             Update& operator=(Update&& update) = delete ;
-            ~Update(){
-                delete _roadInformation;
-            };
+            ~Update()=default;
             double getTraversalTimeImpact()const{
                 try{
                    return _roadInformation->getTraversalTimeImpact();
@@ -87,7 +108,7 @@ namespace map_updater{
         private:
         const int _updateId;
         int _roadId;
-        RoadInformation* _roadInformation;
+        std::shared_ptr<const RoadInformation> _roadInformation;
     };
 class MapUpdater 
 {
@@ -118,8 +139,7 @@ class MapUpdater
                 if(add_or_remove_generator(rand_gen)){
                     //generate update
                     int road_id = road_id_generator(rand_gen);
-                    UpdateSignal(Update(update_id,road_id
-                                ,new RoadInformation((int)delay_generator(rand_gen),blocked_generator(rand_gen),msg)));
+                    UpdateSignal(Update(update_id,road_id,RoadInformation((int)delay_generator(rand_gen),blocked_generator(rand_gen),msg)));
                     update_deque.push_front(std::pair<unsigned,int>(update_id++,road_id));
                 }
                 else if(update_deque.size()>0){
