@@ -5,6 +5,7 @@
 namespace BusRouter{
 namespace Map{
 
+    //Empty primary
     template<typename FROM, typename TO,typename GRAPH, typename ROADS, typename PATHS, typename TOGGLE = void>
     struct FindPath_Impl{};
 
@@ -22,18 +23,22 @@ namespace Map{
     //To and from are different & Next city is not in path
     template<typename FROM,typename TO,typename GRAPH,typename ROAD, typename... ROADS, typename... PATHS>
     struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
+    //!is_same<FROM,TO> is required since equally specialized as target reached.
     std::enable_if_t<!std::is_same<FROM,TO>::value && !TL::List_Contains_v<typename ROAD::to, typename Path<PATHS...>::cities>>
     >{
         //helper defs - should go?
         typedef typename ROAD::to NextCity;
         typedef typename GetRoadsFromCity<NextCity,GRAPH>::type RoadsFromNextCity;
         typedef typename FindPath_Impl<FROM,TO,GRAPH,TL::List<ROADS...>,TL::List<PATHS...>>::type PathWithoutNextRoad;
-        typedef typename FindPath_Impl<NextCity,TO,GRAPH,RoadsFromNextCity, TL::List<PATHS...,ROAD>>::type PathWithNextRoad; //må kun evalueres hvis path ikke indeholder dest for road. ellers inf loop
-        //Road goes back to previously visited City.
+        //can only be evaluated if path doesn't contain dest for road. otherwise inf loop
+        typedef typename FindPath_Impl<NextCity,TO,GRAPH,RoadsFromNextCity, TL::List<PATHS...,ROAD>>::type PathWithNextRoad;
+
+        //Pick shortest path
         typedef typename Path_Comparer<PathWithNextRoad, //add road to path, and advance to next city
-                                PathWithoutNextRoad> // skip current road and try next.
+                                PathWithoutNextRoad> // skip current road and try next road.
                                 ::shortest type;
     };
+
     //To and from are different & Next city is in path
     template<typename FROM,typename TO,typename GRAPH,typename ROAD, typename... ROADS, typename... PATHS>
     struct FindPath_Impl<FROM,TO,GRAPH,TL::List<ROAD,ROADS...>,TL::List<PATHS...>,
@@ -45,17 +50,19 @@ namespace Map{
 
     template<typename FROM, typename TO,typename GRAPH>
     struct FindPath{
+        //Only run algorithm if both FROM and TO are in GRAPH. 
         // std::enable_if_t<(TL::List_Contains<FROM,typename GRAPH::cities>::type::value && TL::List_Contains<TO,typename GRAPH::cities>::type::value)>
         typedef typename FindPath_Impl<FROM,TO,GRAPH,typename GetRoadsFromCity<FROM,GRAPH>::type,TL::List<>>::type type;
     };
-
+    
+    //Find path with multiple stops.
     template<typename GRAPH, typename... Points>
     struct FindPaths{
         typedef Path<> type;
     };
+
     template<typename GRAPH,typename FROM, typename TO,typename... Ts>
     struct FindPaths<GRAPH,FROM,TO,Ts...>{
-        // std::enable_if_t<(TL::List_Contains<FROM,typename GRAPH::cities>::type::value && TL::List_Contains<TO,typename GRAPH::cities>::type::value)>
         typedef Path_Impl<typename TL::List_Concatenate<
         typename FindPath<FROM,TO,GRAPH>::type::list
         ,typename FindPaths<GRAPH,TO,Ts...>::type::list>::type > type;

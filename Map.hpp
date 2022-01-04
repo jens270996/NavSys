@@ -23,27 +23,28 @@ namespace Map{
         typedef TRoads roads;
         typedef TCities cities;
     };
+    //Empty primary
     template<typename City, typename Roads>
-    struct GetRoadsFromCity_Impl{
-        // typedef typename GetRoadsFromCity<
-    };
+    struct GetRoadsFromCity_Impl{};
+
     //First road in roads springs out from city
     template<typename City,typename Road1To,int R1W,int R1C, size_t R1ID,typename... Roads>
     struct GetRoadsFromCity_Impl<City,TL::List<Road<City,Road1To,R1W,R1C,R1ID>,Roads...>>{
+        //Concatenate Road which springs out from city with return from recursive call to GetRoadsFromCity_Impl
         typedef typename TL::List_Concatenate<
                             Road<City,Road1To,R1W,R1C,R1ID>,
                             typename GetRoadsFromCity_Impl<City,TL::List<Roads...>>::type
                 >::type type;
     };
-    //First road in roads doesn't spring out from city
+    //First road in roads doesn't spring out from city, make recursive call without first road.
     template<typename City,typename Road1From, typename Road1To,int R1W,int R1C, size_t R1ID,typename... Roads>
     struct GetRoadsFromCity_Impl<City,TL::List<Road<Road1From,Road1To,R1W,R1C,R1ID>,Roads...>>{
         typedef typename GetRoadsFromCity_Impl<City,TL::List<Roads...>>::type type;
     };
+    //Went through all roads in graph. Return empty list.
     template<typename City>
     struct GetRoadsFromCity_Impl<City,TL::List<>>{
         typedef TL::List<> type;
-        // typedef typename GetRoadsFromCity<
     };
 
     template<typename City,typename Graph>
