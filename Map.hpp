@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include "List.hpp"
+namespace BusRouter{
 namespace Map{
     template <typename Tfrom, typename Tto, int Weight, int Cost,size_t ID>
     struct Road{
@@ -49,4 +50,5 @@ namespace Map{
     struct GetRoadsFromCity{
         typedef typename GetRoadsFromCity_Impl<City,typename Graph::roads>::type type;
     };
+}
 }

@@ -2,6 +2,7 @@
 #include "Path.hpp"
 #include "Map.hpp"
 #include "List.hpp"
+namespace BusRouter{
 namespace Map{
 
     template<typename FROM, typename TO,typename GRAPH, typename ROADS, typename PATHS, typename TOGGLE = void>
@@ -59,5 +60,5 @@ namespace Map{
         typename FindPath<FROM,TO,GRAPH>::type::list
         ,typename FindPaths<GRAPH,TO,Ts...>::type::list>::type > type;
     };
-
+}
 }

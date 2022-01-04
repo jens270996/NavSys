@@ -3,7 +3,9 @@
 #include "RoadMap.hpp"
 
 int main(void){
-    using namespace Map::RoadMap;
+    using namespace BusRouter::Map::RoadMap;
+    using namespace BusRouter::BusUpdate;
+    using namespace BusRouter;
     MapUpdater map;
     RoadInformation *roadInformation = new RoadInformation(40, true, "RoadInformation");
     BusUpdateCenter center(map);

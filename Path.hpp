@@ -3,6 +3,7 @@
 #include "Map.hpp"
 #include <array>
 #include <vector>
+namespace BusRouter{
 namespace Map{
     template<typename T, typename U = void>
     struct Path_Impl{};
@@ -113,4 +114,5 @@ namespace Map{
             return;
         }
     };
+}
 }

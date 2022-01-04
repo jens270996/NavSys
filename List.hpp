@@ -1,6 +1,7 @@
 #pragma once
 #include<type_traits>
-
+namespace BusRouter{
+namespace Map{
 namespace TL{
     struct Invalid_Type{};
 
@@ -108,4 +109,6 @@ namespace TL{
         }
     };
 
+}
+}
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Map.hpp"
+namespace BusRouter{
 namespace Map{
 namespace RoadMap{
     //Actual map
@@ -131,5 +132,6 @@ namespace RoadMap{
 
     ,TL::List<Aarhus_Skanderborg,Skanderborg_Aarhus,Skanderborg_Horsens,Horsens_Skanderborg>
     >;
+}
 }
 }
