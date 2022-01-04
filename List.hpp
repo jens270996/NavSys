@@ -2,33 +2,21 @@
 #include<type_traits>
 
 namespace TL{
-
-    template <typename T,typename... Ts>
-    struct List_impl
-    {
-        typedef T first;
-        typedef typename List_impl<Ts...>::last last;
-    };
-template <typename T>
-    struct List_impl<T>
-    {
-        typedef T first;
-        typedef T last;
-    };
     struct Invalid_Type{};
 
+    //Primary empty template class
     template <typename... Ts>
     struct List{};
-
+    //Partial for list with items
     template <typename T,typename... Ts>
     struct List<T,Ts...>
     {
         static const size_t size = sizeof...(Ts)+1;
-        typedef typename List_impl<T,Ts...>::last last;
-        typedef typename List_impl<T,Ts...>::first first;
+        typedef std::conditional_t<size==1,T,typename List<Ts...>::last> last;
+        typedef T first;
         typedef List<Ts...> rest;
     };
-
+    //Fully for empty list
     template <>
     struct List<>
     {
